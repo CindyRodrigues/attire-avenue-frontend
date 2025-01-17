@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom"
 
 const Header = () => {
     return (
-        <header className="navbar navbar-expand-lg sticky-top bg-body-tertiary">
+        <header className="navbar navbar-expand-lg bg-white text-dark sticky-top">
             <nav className="container">
                 <NavLink to="/" className="navbar-brand">AttireAvenue</NavLink>
                 <div className="input-group" style={{ maxWidth: "400px"}}>
