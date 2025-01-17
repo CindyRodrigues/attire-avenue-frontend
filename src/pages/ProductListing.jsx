@@ -1,19 +1,18 @@
-import Header from '../components/Header'
+import { useDispatch, useSelector } from 'react-redux'
 import ProductCard from '../components/ProductCard'
-import useFetch from '../hooks/useFetch'
+import { useEffect } from 'react'
+import { fetchProducts } from '../features/products/productsSlice'
 
 const ProductListing = () => {
-    const {data, loading, error} = useFetch('https://attire-avenue-backend.vercel.app/products')
+    const dispatch = useDispatch()
+    const { products, status, error } = useSelector((state) => state.products)
 
-    // let products = []
-
-    // if(data && data.length !== 0) {
-    //     products = data
-    // }
+    useEffect(() => {
+        dispatch(fetchProducts())
+    }, [dispatch])
 
     return (
         <div>
-            <Header />
             <main className='container-fluid'>
                 <div className='row'>
                     <div className='col-md-3 bg-body-tertiary p-5 sticky-top'>
@@ -76,17 +75,17 @@ const ProductListing = () => {
                             </label>
                         </div>
                     </div>
-                    {error ? <p>Error!</p> : <></>}
-                    {loading && <p>Loading...</p>}
+                    {error && <p>Error: {error}</p>}
+                    {status === "loading" && <p>Loading...</p>}
                     <div className='col-md-9 p-5'>
                         <div className='row mb-4'>
-                            <p className='text-body-secondary'>Showing {data && data.length} products</p>
+                            <p className='text-body-secondary'>Showing {products.length} products</p>
                         </div>
                         <div className='row'>
                             {
-                                data &&
-                                data.length !== 0 &&
-                                data.map(product => (
+                                status === "success" &&
+                                products.length > 0 &&
+                                products.map(product => (
                                     <div className='col-md-4 mb-4' key={product._id}>
                                         <ProductCard product={product} />
                                     </div>
