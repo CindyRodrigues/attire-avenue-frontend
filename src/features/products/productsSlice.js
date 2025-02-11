@@ -11,9 +11,24 @@ export const productsSlice = createSlice({
     initialState: {
         products: [],
         status: "idle",
-        error: null
+        error: null,
+        filters: {
+            category: [],
+            rating: "",
+            sortBy: "",
+            price: 0
+        }
     },
-    reducers: {},
+    reducers: {
+        updateCategoryFilter: (state, action) => {
+            const { value, checked } = action.payload
+            if(checked) {
+                state.filters.category.push(value)
+            } else {
+                state.filters.category = state.filters.category.filter((category) => category !== value)
+            }
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(fetchProducts.pending, (state) => {
             state.status = "loading"
@@ -28,5 +43,7 @@ export const productsSlice = createSlice({
         })
     }
 })
+
+export const { updateCategoryFilter } = productsSlice.actions
 
 export default productsSlice.reducer
