@@ -39,6 +39,9 @@ export const productsSlice = createSlice({
         updateRatingFilter: (state, action) => {
             state.filters.rating = parseInt(action.payload)
         },
+        updateSortByFilter: (state, action) => {
+            state.filters.sortBy = action.payload
+        },
         clearFilters: (state, action) => {
             state.filters = action.payload
         }
@@ -58,6 +61,6 @@ export const productsSlice = createSlice({
     }
 })
 
-export const { updateCategoryFilter, updateRatingFilter, clearFilters } = productsSlice.actions
+export const { updateCategoryFilter, updateRatingFilter, updateSortByFilter, clearFilters } = productsSlice.actions
 
 export default productsSlice.reducer

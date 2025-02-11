@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import ProductCard from '../components/ProductCard'
 import { useEffect } from 'react'
-import { clearFilters, fetchProducts, updateCategoryFilter, updateRatingFilter } from '../features/products/productsSlice'
+import { clearFilters, fetchProducts, updateCategoryFilter, updateRatingFilter, updateSortByFilter } from '../features/products/productsSlice'
 import { useLocation } from 'react-router-dom'
 
 const ProductListing = () => {
@@ -32,6 +32,10 @@ const ProductListing = () => {
         dispatch(updateRatingFilter(event.target.value))
     }
 
+    const handleSortByFilter = (event) => {
+        dispatch(updateSortByFilter(event.target.value))
+    }
+
     const handleClearFilter = () => {
         dispatch(clearFilters({
             category: ["All"],
@@ -41,8 +45,10 @@ const ProductListing = () => {
         }))
     }
 
-    const selectedProducts = products?.filter((product) => category.includes("All") || category.includes(product.category))
+    const filteredProducts = products?.filter((product) => category.includes("All") || category.includes(product.category))
     .filter((product) => product.rating >= rating)
+
+    const sortedProducts = sortBy === "priceLowToHigh" ? filteredProducts.sort((productOne, productTwo) => productOne.price - productTwo.price) : sortBy === "priceHighToLow" ? filteredProducts.sort((productOne, productTwo) => productTwo.price - productOne.price) : filteredProducts
 
     return (
         <div>
@@ -128,31 +134,37 @@ const ProductListing = () => {
                         <div>
                             <p className='fw-bold'>Sort By</p>
                             <label htmlFor='priceLowToHigh'>
-                                <input type='radio' id="priceLowToHigh" /> Price - Low to High
+                                <input type='radio' id="priceLowToHigh" name="sortBy" value="priceLowToHigh"
+                                checked={sortBy === "priceLowToHigh"}
+                                onChange={handleSortByFilter} /> Price - Low to High
                             </label>
                             <br />
                             <label htmlFor='priceHighToLow'>
-                                <input type='radio' id="priceHighToLow" /> Price - High to Low
+                                <input type='radio' id="priceHighToLow" name="sortBy" value="priceHighToLow"
+                                checked={sortBy === "priceHighToLow"}
+                                onChange={handleSortByFilter} /> Price - High to Low
                             </label>
                         </div>
                     </div>
                     <div className='col-md-9 p-5'>
                         {error && <p>Error: {error}</p>}
                         {status === "loading" && <p>Loading...</p>}
-                        <div className='row mb-4'>
-                            <p className='text-body-secondary'>Showing {selectedProducts.length} products</p>
-                        </div>
-                        <div className='row'>
-                            {
-                                status === "success" &&
-                                selectedProducts.length > 0 &&
-                                selectedProducts.map(product => (
-                                    <div className='col-md-4 mb-4' key={product._id}>
-                                        <ProductCard product={product} />
-                                    </div>
-                                ))
-                            }
-                        </div>
+                        {status === "success" && <>
+                            <div className='row mb-4'>
+                                <p className='text-body-secondary'>Showing {sortedProducts.length} products</p>
+                            </div>
+                            <div className='row'>
+                                {
+                                    sortedProducts.length > 0 &&
+                                    sortedProducts.map(product => (
+                                        <div className='col-md-4 mb-4' key={product._id}>
+                                            <ProductCard product={product} />
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </>
+                        }
                     </div>
                 </div>
             </main>
