@@ -16,7 +16,7 @@ export const productsSlice = createSlice({
             category: ["All"],
             rating: 0,
             sortBy: "",
-            price: 0
+            priceRange: 5000
         }
     },
     reducers: {
@@ -42,6 +42,9 @@ export const productsSlice = createSlice({
         updateSortByFilter: (state, action) => {
             state.filters.sortBy = action.payload
         },
+        updatePriceRangeFilter: (state, action) => {
+            state.filters.priceRange = action.payload
+        },
         clearFilters: (state, action) => {
             state.filters = action.payload
         }
@@ -61,6 +64,6 @@ export const productsSlice = createSlice({
     }
 })
 
-export const { updateCategoryFilter, updateRatingFilter, updateSortByFilter, clearFilters } = productsSlice.actions
+export const { updateCategoryFilter, updateRatingFilter, updateSortByFilter, updatePriceRangeFilter, clearFilters } = productsSlice.actions
 
 export default productsSlice.reducer

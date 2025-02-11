@@ -1,14 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux'
 import ProductCard from '../components/ProductCard'
 import { useEffect } from 'react'
-import { clearFilters, fetchProducts, updateCategoryFilter, updateRatingFilter, updateSortByFilter } from '../features/products/productsSlice'
+import { clearFilters, fetchProducts, updateCategoryFilter, updatePriceRangeFilter, updateRatingFilter, updateSortByFilter } from '../features/products/productsSlice'
 import { useLocation } from 'react-router-dom'
 
 const ProductListing = () => {
     const dispatch = useDispatch()
     const location = useLocation()
     const { products, status, error, filters } = useSelector((state) => state.products)
-    const { category, rating, sortBy, price } = filters
+    const { category, rating, sortBy, priceRange } = filters
 
     useEffect(() => {
         dispatch(fetchProducts())
@@ -16,7 +16,7 @@ const ProductListing = () => {
             category: ["All"],
             rating: 0,
             sortBy: "",
-            price: 0
+            priceRange: 5000
         }))
         if(location.state) {
             dispatch(updateCategoryFilter({ value: location.state, checked: true}))
@@ -36,17 +36,22 @@ const ProductListing = () => {
         dispatch(updateSortByFilter(event.target.value))
     }
 
+    const handlePriceFilter = (event) => {
+        dispatch(updatePriceRangeFilter(event.target.value))
+    }
+
     const handleClearFilter = () => {
         dispatch(clearFilters({
             category: ["All"],
             rating: 0,
             sortBy: "",
-            price: 0
+            priceRange: 5000
         }))
     }
 
     const filteredProducts = products?.filter((product) => category.includes("All") || category.includes(product.category))
     .filter((product) => product.rating >= rating)
+    .filter((product) => product.price <= priceRange)
 
     const sortedProducts = sortBy === "priceLowToHigh" ? filteredProducts.sort((productOne, productTwo) => productOne.price - productTwo.price) : sortBy === "priceHighToLow" ? filteredProducts.sort((productOne, productTwo) => productTwo.price - productOne.price) : filteredProducts
 
@@ -56,15 +61,17 @@ const ProductListing = () => {
                 <div className='row'>
                     <div className='col-md-3 bg-body-tertiary p-5'>
                         <div className='d-flex justify-content-between align-items-center mb-4'>
-                            <p className='fw-bold'>Filters</p>
-                            <button className='btn btn-link' onClick={handleClearFilter}>Clear</button>
+                            <p className='fw-bold m-0'>Filters</p>
+                            <button className='btn btn-link p-0' onClick={handleClearFilter}>Clear</button>
                         </div>
                         <div className='mb-4'>
                             <p className='fw-bold'>Price</p>
-                            <input type="range" className='form-range' min="200" max="8500" />
+                            <input type="range" className='form-range' min="1000" max="5000" step="500" value={priceRange}
+                            onChange={handlePriceFilter} />
                             <div className='d-flex justify-content-between'>
-                                <span>200</span>
-                                <span>8500</span>
+                                <span>1000</span>
+                                <span>3000</span>
+                                <span>5000</span>
                             </div>
                         </div>
                         <div className='mb-4'>
