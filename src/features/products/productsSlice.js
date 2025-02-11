@@ -13,8 +13,8 @@ export const productsSlice = createSlice({
         status: "idle",
         error: null,
         filters: {
-            category: [],
-            rating: "",
+            category: ["All"],
+            rating: 0,
             sortBy: "",
             price: 0
         }
@@ -22,11 +22,25 @@ export const productsSlice = createSlice({
     reducers: {
         updateCategoryFilter: (state, action) => {
             const { value, checked } = action.payload
-            if(checked) {
-                state.filters.category.push(value)
+            if(value === "All") {
+                if(checked) {
+                    state.filters.category = ["All"]
+                } else {
+                    state.filters.category = []
+                }
             } else {
-                state.filters.category = state.filters.category.filter((category) => category !== value)
+                if(checked) {
+                    state.filters.category = state.filters.category.filter((category) => category !== "All").concat(value)
+                } else {
+                    state.filters.category = state.filters.category.filter((category) => category !== value)
+                }
             }
+        },
+        updateRatingFilter: (state, action) => {
+            state.filters.rating = parseInt(action.payload)
+        },
+        clearFilters: (state, action) => {
+            state.filters = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -44,6 +58,6 @@ export const productsSlice = createSlice({
     }
 })
 
-export const { updateCategoryFilter } = productsSlice.actions
+export const { updateCategoryFilter, updateRatingFilter, clearFilters } = productsSlice.actions
 
 export default productsSlice.reducer

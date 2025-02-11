@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import ProductCard from '../components/ProductCard'
 import { useEffect } from 'react'
-import { fetchProducts, updateCategoryFilter } from '../features/products/productsSlice'
+import { clearFilters, fetchProducts, updateCategoryFilter, updateRatingFilter } from '../features/products/productsSlice'
 import { useLocation } from 'react-router-dom'
 
 const ProductListing = () => {
@@ -12,6 +12,12 @@ const ProductListing = () => {
 
     useEffect(() => {
         dispatch(fetchProducts())
+        dispatch(clearFilters({
+            category: ["All"],
+            rating: 0,
+            sortBy: "",
+            price: 0
+        }))
         if(location.state) {
             dispatch(updateCategoryFilter({ value: location.state, checked: true}))
         }
@@ -22,16 +28,30 @@ const ProductListing = () => {
         dispatch(updateCategoryFilter({ value, checked }))
     }
 
-    const selectedProducts = products?.filter((product) => category.includes(product.category))
+    const handleRatingFilter = (event) => {
+        dispatch(updateRatingFilter(event.target.value))
+    }
+
+    const handleClearFilter = () => {
+        dispatch(clearFilters({
+            category: ["All"],
+            rating: 0,
+            sortBy: "",
+            price: 0
+        }))
+    }
+
+    const selectedProducts = products?.filter((product) => category.includes("All") || category.includes(product.category))
+    .filter((product) => product.rating >= rating)
 
     return (
         <div>
             <main className='container-fluid'>
                 <div className='row'>
                     <div className='col-md-3 bg-body-tertiary p-5'>
-                        <div className='d-flex justify-content-between mb-4'>
+                        <div className='d-flex justify-content-between align-items-center mb-4'>
                             <p className='fw-bold'>Filters</p>
-                            <button className='btn btn-link'>Clear</button>
+                            <button className='btn btn-link' onClick={handleClearFilter}>Clear</button>
                         </div>
                         <div className='mb-4'>
                             <p className='fw-bold'>Price</p>
@@ -43,6 +63,12 @@ const ProductListing = () => {
                         </div>
                         <div className='mb-4'>
                             <p className='fw-bold'>Category</p>
+                            <label htmlFor='allProducts'>
+                                <input type="checkbox" id="allProducts" value="All"
+                                checked={category.includes("All")}
+                                onChange={handleCategoryFilter} /> All Products
+                            </label>
+                            <br />
                             <label htmlFor='men'>
                                 <input type="checkbox" id="men" value="Men"
                                 checked={category.includes("Men")}
@@ -69,20 +95,34 @@ const ProductListing = () => {
                         </div>
                         <div className='mb-4'>
                             <p className='fw-bold'>Rating</p>
+                            <label htmlFor='allRating'>
+                                <input type="radio" id="allRating" name="rating" value={0}
+                                checked={rating === 0}
+                                onChange={handleRatingFilter} /> All Ratings
+                            </label>
+                            <br />
                             <label htmlFor='4AndAbove'>
-                                <input type="radio" id="4AndAbove" name="rating" /> 4 stars & above
+                                <input type="radio" id="4AndAbove" name="rating" value={4}
+                                checked={rating === 4}
+                                onChange={handleRatingFilter} /> 4 stars & above
                             </label>
                             <br />
                             <label htmlFor='3AndAbove'>
-                                <input type="radio" id="3AndAbove" name="rating" /> 3 stars & above
+                                <input type="radio" id="3AndAbove" name="rating" value={3}
+                                checked={rating === 3}
+                                onChange={handleRatingFilter} /> 3 stars & above
                             </label>
                             <br />
                             <label htmlFor='2AndAbove'>
-                                <input type="radio" id="2AndAbove" name="rating" /> 2 stars & above
+                                <input type="radio" id="2AndAbove" name="rating" value={2}
+                                checked={rating === 2}
+                                onChange={handleRatingFilter} /> 2 stars & above
                             </label>
                             <br />
                             <label htmlFor='1AndAbove'>
-                                <input type="radio" id="1AndAbove" name="rating" /> 1 stars & above
+                                <input type="radio" id="1AndAbove" name="rating" value={1}
+                                checked={rating === 1}
+                                onChange={handleRatingFilter} /> 1 stars & above
                             </label>
                         </div>
                         <div>
@@ -100,7 +140,7 @@ const ProductListing = () => {
                         {error && <p>Error: {error}</p>}
                         {status === "loading" && <p>Loading...</p>}
                         <div className='row mb-4'>
-                            <p className='text-body-secondary'>Showing {products.length} products</p>
+                            <p className='text-body-secondary'>Showing {selectedProducts.length} products</p>
                         </div>
                         <div className='row'>
                             {
