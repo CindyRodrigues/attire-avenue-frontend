@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { fetchProducts } from "../features/products/productsSlice"
 import ProductCard from "../components/ProductCard"
 import { addToWishlist, removeFromWishlist } from "../features/wishlist/wishlistSlice"
+import { addItemToCart } from "../features/cart/cartSlice"
 
 const ProductDetail = () => {
     const dispatch = useDispatch()
     const { productId } = useParams()
     const { products, status, error } = useSelector((state) => state.products)
     const { wishlist } = useSelector((state) => state.wishlist)
+    const { cart } = useSelector((state) => state.cart)
 
     const currentProduct = products?.find((product) => product._id === productId)
 
@@ -17,6 +19,9 @@ const ProductDetail = () => {
 
     const [isWishlisted, setIsWishlisted] = useState(
         wishlist.findIndex((wishlistItem) => wishlistItem._id === currentProduct._id) === -1 ? false : true
+    )
+    const [inCart, setInCart] = useState(
+        cart.findIndex((cartItem) => cartItem.productId === currentProduct._id) === -1 ? false : true
     )
 
     useEffect(() => {
@@ -32,9 +37,14 @@ const ProductDetail = () => {
             dispatch(removeFromWishlist(currentProduct._id))
             setIsWishlisted(false)
         } else {
-            dispatch(addToWishlist(currentProduct))
+            dispatch(addToWishlist(currentProduct._id))
             setIsWishlisted(true)
         }
+    }
+
+    const handleCart = () => {
+        dispatch(addItemToCart({productId: currentProduct._id}))
+        setInCart(true)
     }
 
     return (
@@ -61,10 +71,19 @@ const ProductDetail = () => {
                             <span className="fs-5 text-decoration-line-through text-body-tertiary me-3">₹{currentProduct.price.toFixed(2)}</span>
                             <span className="fs-5 fw-bold text-body-tertiary">{currentProduct.discount}% off</span>
                         </p>
-                        <button className="btn btn-secondary me-5 mb-4 rounded-0">
-                            <i className="bi bi-cart me-2"></i>
-                            Add To Cart
-                        </button>
+                        {
+                            inCart ? (
+                                <Link to="/cart" className="btn btn-secondary me-5 mb-4 rounded-0 text-decoration-none">
+                                    <i className="bi bi-cart me-2"></i>
+                                    Go To Cart
+                                </Link>
+                            ) : (
+                                <button className="btn btn-secondary me-5 mb-4 rounded-0" onClick={handleCart}>
+                                    <i className="bi bi-cart me-2"></i>
+                                    Add To Cart
+                                </button>
+                            )
+                        }
                         <button className="btn btn-secondary mb-4 rounded-0" onClick={handleWishlist}>
                             <i className="bi bi-heart me-2"></i>
                             {isWishlisted ? "Remove From Wishlist" : "Add To Wishlist"}

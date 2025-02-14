@@ -3,7 +3,12 @@ import { Link } from "react-router-dom"
 import ProductCard from "../components/ProductCard"
 
 const Wishlist = () => {
+    // const dispatch = useDispatch()
     const { wishlist } = useSelector((state) => state.wishlist)
+
+    // useEffect(() => {
+    //     dispatch(fetchWishlist())
+    // }, [dispatch])
 
     return (
         <main className="container py-5">
