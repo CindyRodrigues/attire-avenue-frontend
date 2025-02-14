@@ -14,7 +14,7 @@ const Cart = () => {
     return (
         <main className="container py-5">
             <h1 className="display-3 text-center">My Cart</h1>
-            <p className="fs-3 text-center">You have {cart.length} items in your cart</p>
+            <p className="fs-3 text-center">You have {cart?.length} items in your cart</p>
             {
                 cart.length === 0 ? (
                     <div className="text-center">

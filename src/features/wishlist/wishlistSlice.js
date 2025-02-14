@@ -1,18 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const fetchWishlist = createAsyncThunk("wishlist/fetchWishlist", async () => {
+export const fetchWishlistItems = createAsyncThunk("wishlist/fetchWishlistItems", async () => {
     const response = await axios.get('https://attire-avenue-backend.vercel.app/wishlist')
     return response.data
 })
 
-export const addWishlistProduct = createAsyncThunk("wishlist/addWishlistProduct", async (productId) => {
-    const response = await axios.post('https://attire-avenue-backend.vercel.app/wishlist', {product: productId})
+export const addItemToWishlist = createAsyncThunk("wishlist/addItemToWishlist", async (wishlistItem) => {
+    const response = await axios.post('https://attire-avenue-backend.vercel.app/wishlist', wishlistItem)
     return response.data
 })
 
-export const removeWishlistProduct = createAsyncThunk("wishlist/removeWishlistProduct", async (productId) => {
-    const response = await axios.delete(`https://attire-avenue-backend.vercel.app/products/${productId}`)
+export const removeItemFromWishlist = createAsyncThunk("wishlist/removeItemFromWishlist", async (productId) => {
+    const response = await axios.delete(`https://attire-avenue-backend.vercel.app/wishlist/${productId}`)
     return response.data
 })
 
@@ -23,51 +23,42 @@ export const wishlistSlice = createSlice({
         status: "idle",
         error: null
     },
-    reducers: {
-        addToWishlist: (state, action) => {
-            state.wishlist.push(action.payload)
-        },
-        removeFromWishlist: (state, action) => {
-            state.wishlist = state.wishlist.filter((wishlistItem) => wishlistItem._id !== action.payload)
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchWishlist.pending, (state) => {
+        builder.addCase(fetchWishlistItems.pending, (state) => {
             state.status = "loading"
         })
-        builder.addCase(fetchWishlist.fulfilled, (state, action) => {
+        builder.addCase(fetchWishlistItems.fulfilled, (state, action) => {
             state.status = "success"
             state.wishlist = action.payload
         })
-        builder.addCase(fetchWishlist.rejected, (state, action) => {
+        builder.addCase(fetchWishlistItems.rejected, (state, action) => {
             state.status = "error"
             state.error = action.error.message
         })
-        builder.addCase(addWishlistProduct.pending, (state) => {
+        builder.addCase(addItemToWishlist.pending, (state) => {
             state.status = "loading"
         })
-        builder.addCase(addWishlistProduct.fulfilled, (state, action) => {
+        builder.addCase(addItemToWishlist.fulfilled, (state, action) => {
             state.status = "success"
-            state.wishlist.push(action.payload.wishlistProduct)
+            state.wishlist.push(action.payload.wishlistItem)
         })
-        builder.addCase(addWishlistProduct.rejected, (state, action) => {
+        builder.addCase(addItemToWishlist.rejected, (state, action) => {
             state.status = "error"
             state.error = action.error.message
         })
-        builder.addCase(removeWishlistProduct.pending, (state) => {
+        builder.addCase(removeItemFromWishlist.pending, (state) => {
             state.status = "loading"
         })
-        builder.addCase(removeWishlistProduct.fulfilled, (state, action) => {
+        builder.addCase(removeItemFromWishlist.fulfilled, (state, action) => {
             state.status = "success"
-            state.wishlist = state.wishlist.filter((wishlistItem) => wishlistItem._id !== action.payload.wishlistProduct._id)
+            state.wishlist = state.wishlist.filter((wishlistItem) => wishlistItem._id !== action.payload.wishlistItem._id)
         })
-        builder.addCase(removeWishlistProduct.rejected, (state, action) => {
+        builder.addCase(removeItemFromWishlist.rejected, (state, action) => {
             state.status = "error"
             state.error = action.error.message
         })
     }
 })
-
-export const { addToWishlist, removeFromWishlist } = wishlistSlice.actions
 
 export default wishlistSlice.reducer

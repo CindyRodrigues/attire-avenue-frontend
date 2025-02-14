@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { addToWishlist, removeFromWishlist } from "../features/wishlist/wishlistSlice"
+import { addItemToWishlist, fetchWishlistItems, removeItemFromWishlist } from "../features/wishlist/wishlistSlice"
 import { addItemToCart, fetchCartItems } from "../features/cart/cartSlice"
 
 const ProductCard = ({ product }) => {
@@ -10,22 +10,23 @@ const ProductCard = ({ product }) => {
     const { cart } = useSelector((state) => state.cart)
 
     const [isWishlisted, setIsWishlisted] = useState(
-        wishlist.findIndex((wishlistItem) => wishlistItem._id === product._id) === -1 ? false : true
+        wishlist?.findIndex((wishlistItem) => wishlistItem.productId === product._id) === -1 ? false : true
     )
     const [inCart, setInCart] = useState(
-        cart.findIndex((cartItem) => cartItem.productId === product._id) === -1 ? false : true
+        cart?.findIndex((cartItem) => cartItem.productId === product._id) === -1 ? false : true
     )
 
     useEffect(() => {
         dispatch(fetchCartItems())
+        dispatch(fetchWishlistItems())
     }, [dispatch])
 
     const handleWishlist = () => {
         if(isWishlisted) {
-            dispatch(removeFromWishlist(product._id))
+            dispatch(removeItemFromWishlist(product._id))
             setIsWishlisted(false)
         } else {
-            dispatch(addToWishlist(product))
+            dispatch(addItemToWishlist({productId: product._id}))
             setIsWishlisted(true)
         }
     }

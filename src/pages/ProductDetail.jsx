@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams, Link } from "react-router-dom"
 import { fetchProducts } from "../features/products/productsSlice"
 import ProductCard from "../components/ProductCard"
-import { addToWishlist, removeFromWishlist } from "../features/wishlist/wishlistSlice"
-import { addItemToCart } from "../features/cart/cartSlice"
+import { addItemToWishlist, fetchWishlistItems, removeItemFromWishlist } from "../features/wishlist/wishlistSlice"
+import { addItemToCart, fetchCartItems } from "../features/cart/cartSlice"
 
 const ProductDetail = () => {
     const dispatch = useDispatch()
@@ -18,14 +18,16 @@ const ProductDetail = () => {
     const similarProducts = products?.filter((product) => product.category === currentProduct.category && product._id !== currentProduct._id)
 
     const [isWishlisted, setIsWishlisted] = useState(
-        wishlist.findIndex((wishlistItem) => wishlistItem._id === currentProduct._id) === -1 ? false : true
+        wishlist?.findIndex((wishlistItem) => wishlistItem.productId === currentProduct._id) === -1 ? false : true
     )
     const [inCart, setInCart] = useState(
-        cart.findIndex((cartItem) => cartItem.productId === currentProduct._id) === -1 ? false : true
+        cart?.findIndex((cartItem) => cartItem.productId === currentProduct._id) === -1 ? false : true
     )
 
     useEffect(() => {
         dispatch(fetchProducts())
+        dispatch(fetchWishlistItems())
+        dispatch(fetchCartItems())
     }, [dispatch])
 
     useEffect(() => {
@@ -34,10 +36,10 @@ const ProductDetail = () => {
 
     const handleWishlist = () => {
         if(isWishlisted) {
-            dispatch(removeFromWishlist(currentProduct._id))
+            dispatch(removeItemFromWishlist(currentProduct._id))
             setIsWishlisted(false)
         } else {
-            dispatch(addToWishlist(currentProduct._id))
+            dispatch(addItemToWishlist({productId: currentProduct._id}))
             setIsWishlisted(true)
         }
     }
