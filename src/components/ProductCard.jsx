@@ -1,15 +1,24 @@
 import { useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { addToWishlist, removeFromWishlist } from "../features/wishlist/wishlistSlice"
+import { addItemToCart, fetchCartItems } from "../features/cart/cartSlice"
 
 const ProductCard = ({ product }) => {
     const dispatch = useDispatch()
     const { wishlist } = useSelector((state) => state.wishlist)
+    const { cart } = useSelector((state) => state.cart)
 
     const [isWishlisted, setIsWishlisted] = useState(
         wishlist.findIndex((wishlistItem) => wishlistItem._id === product._id) === -1 ? false : true
     )
+    const [inCart, setInCart] = useState(
+        cart.findIndex((cartItem) => cartItem.productId === product._id) === -1 ? false : true
+    )
+
+    useEffect(() => {
+        dispatch(fetchCartItems())
+    }, [dispatch])
 
     const handleWishlist = () => {
         if(isWishlisted) {
@@ -19,6 +28,11 @@ const ProductCard = ({ product }) => {
             dispatch(addToWishlist(product))
             setIsWishlisted(true)
         }
+    }
+
+    const handleCart = () => {
+        dispatch(addItemToCart({productId: product._id}))
+        setInCart(true)
     }
 
     return (
@@ -39,10 +53,19 @@ const ProductCard = ({ product }) => {
                 </div>
             </Link>
             <div className="card-body d-flex justify-content-between">
-                <button className="btn btn-secondary btn-sm rounded-0 me-1">
-                    <i class="bi bi-cart me-2"></i>
-                    Add to cart
-                </button>
+                {
+                    inCart ? (
+                        <Link to="/cart" className="btn btn-secondary btn-sm rounded-0 me-1 text-decoration-none">
+                            <i class="bi bi-cart me-2"></i>
+                            Go To Cart
+                        </Link>
+                    ) : (
+                        <button className="btn btn-secondary btn-sm rounded-0 me-1" onClick={handleCart}>
+                            <i class="bi bi-cart me-2"></i>
+                            Add to cart
+                        </button>
+                    )
+                }
                 <button className="btn btn-secondary btn-sm rounded-0 ms-1" onClick={handleWishlist}>
                     <i class="bi bi-heart me-2"></i>
                     {isWishlisted ? "Remove From Wishlist" : "Add To wishlist"}
