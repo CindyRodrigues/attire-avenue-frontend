@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { fetchWishlistItems } from "../features/wishlist/wishlistSlice"
 import { useEffect } from "react"
+import WishlistItem from '../components/WishlistItem'
 
 const Wishlist = () => {
     const dispatch = useDispatch()
@@ -24,8 +25,8 @@ const Wishlist = () => {
                     <div className="row">
                         {
                             wishlist && wishlist.length > 0 && wishlist.map((wishlistItem) => (
-                                <div className="col-md-3 mb-4" key={wishlistItem._id}>
-                                    {/* <ProductCard product={wishlistItem} /> */}
+                                <div className="col-md-6">
+                                    <WishlistItem productId={wishlistItem.productId} />
                                 </div>
                             ))
                         }
