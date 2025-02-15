@@ -42,7 +42,11 @@ const ProductCard = ({ product }) => {
                 <img src={product.images[0]} alt={product.name} className="card-img-top img-fluid rounded-0" style={{height: "350px", objectFit: "cover"}} />
                 <div className="card-body text-center">
                     <h5 className="card-title">{product.name}</h5>
-                    <p className="card-text m-0">₹{product.price}</p>
+                    <p className="card-text m-0">
+                        <span className="fw-bold me-2">₹{(product.price - (product.price * product.discount / 100)).toFixed(2)}</span>
+                        <span className="text-decoration-line-through text-body-tertiary me-2">₹{(product.price).toFixed(2)}</span>
+                        <span>{product.discount}% off</span>
+                    </p>
                     <p className="card-text">
                         <span className="me-3">{product.rating}</span>
                         <i className={`bi ${product.rating >= 1 ? "bi-star-fill" : product.rating >= 0.5 ? "bi-star-half" : "bi-star"}`}></i>
